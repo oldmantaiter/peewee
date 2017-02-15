@@ -1021,6 +1021,23 @@ class Field(Node):
         ddl = [self.as_entity(), self.__ddl_column__(column_type)]
         if not self.null:
             ddl.append(SQL('NOT NULL'))
+        if self.default is not None:
+            if self.default == "CURRENT_TIMESTAMP":
+                default = self.default
+            elif callable(self.default):
+                try:
+                    if isinstance(self.default(), datetime.datetime):
+                        default = "CURRENT_TIMESTAMP"
+                    else:
+                        default = None
+                except:
+                    default = None
+            elif isinstance(self.default, bool):
+                default = 1 if self.default else 0
+            else:
+                default = "'%s'" % self.default
+            if default is not None:
+                ddl.append(SQL("DEFAULT %s" % default))
         if self.primary_key:
             ddl.append(SQL('PRIMARY KEY'))
         if self.sequence:
