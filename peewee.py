@@ -3424,10 +3424,11 @@ class InsertQuery(_WriteQuery):
                     raise KeyError('"%s" is not a recognized field.' % field)
 
         defaults = model_meta._default_dict
+        declared_defaults = dict([(k, v) for (k, v) in defaults.items() if not k.undeclared])
         callables = model_meta._default_callables
 
         for row_dict in self._rows:
-            field_row = defaults.copy()
+            field_row = declared_defaults.copy()
             seen = set()
             for key in row_dict:
                 if self._validate_fields:
