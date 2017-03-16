@@ -5070,7 +5070,9 @@ class Model(with_metaclass(BaseModel)):
                 field_dict[key] = self._data[key]
 
     def save(self, force_insert=False, only=None):
-        field_dict = dict(self._data)
+        declared_field_names = [f.name for f in self._meta.declared_fields]
+        field_dict = dict([field for field in dict(self._data).items()
+                          if field[0] in declared_field_names])
         if self._meta.primary_key is not False:
             pk_field = self._meta.primary_key
             pk_value = self._get_pk_value()
